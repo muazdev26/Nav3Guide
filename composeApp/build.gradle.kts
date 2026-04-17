@@ -50,6 +50,7 @@ kotlin {
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.material3.adaptive)
             implementation(libs.material3.adaptive.layout)
+            implementation(libs.jetbrains.material3.adaptiveNavigation3)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

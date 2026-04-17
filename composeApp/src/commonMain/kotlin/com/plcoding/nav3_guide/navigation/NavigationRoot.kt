@@ -1,23 +1,33 @@
 package com.plcoding.nav3_guide.navigation
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Task
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
-import com.plcoding.nav3_guide.scenes.ListDetailScene
-import com.plcoding.nav3_guide.scenes.rememberListDetailSceneStrategy
 import com.plcoding.nav3_guide.screens.ChangeSettingScreen
 import com.plcoding.nav3_guide.screens.SettingsScreen
 import com.plcoding.nav3_guide.screens.TodoDetailScreen
 import com.plcoding.nav3_guide.screens.TodoListScreen
+import androidx.compose.material3.adaptive.navigation3.ListDetailSceneStrategy
+import androidx.compose.material3.adaptive.navigation3.rememberListDetailSceneStrategy
+import androidx.navigation3.runtime.NavKey
+import androidx.navigation3.scene.SinglePaneSceneStrategy
 
+@OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
 fun NavigationRoot(
     modifier: Modifier = Modifier
@@ -30,6 +40,7 @@ fun NavigationRoot(
         Navigator(navigationState)
     }
     val resultStore = rememberResultStore()
+    val strategy = rememberListDetailSceneStrategy<NavKey>()
     Scaffold(
         modifier = modifier,
         bottomBar = {
@@ -46,11 +57,15 @@ fun NavigationRoot(
                 .fillMaxSize()
                 .padding(innerPadding),
             onBack = navigator::goBack,
-            sceneStrategy = rememberListDetailSceneStrategy(),
+            sceneStrategies = listOf(strategy),
             entries = navigationState.toEntries(
                 entryProvider {
                     entry<Route.TodoList>(
-                        metadata = ListDetailScene.listPane()
+                        metadata = ListDetailSceneStrategy.listPane(
+                            detailPlaceholder = {
+                                DetailsPlaceholder()
+                            }
+                        )
                     ) {
                         TodoListScreen(
                             onTodoClick = {
@@ -59,7 +74,11 @@ fun NavigationRoot(
                         )
                     }
                     entry<Route.TodoFavorites>(
-                        metadata = ListDetailScene.listPane()
+                        metadata = ListDetailSceneStrategy.listPane(
+                            detailPlaceholder = {
+                                DetailsPlaceholder()
+                            }
+                        )
                     ) {
                         TodoListScreen(
                             onTodoClick = {
@@ -68,7 +87,7 @@ fun NavigationRoot(
                         )
                     }
                     entry<Route.TodoDetail>(
-                        metadata = ListDetailScene.detailPane()
+                        metadata = ListDetailSceneStrategy.detailPane()
                     ) {
                         TodoDetailScreen(
                             todo = it.todo
@@ -93,5 +112,22 @@ fun NavigationRoot(
                 }
             )
         )
+    }
+}
+
+@Composable
+fun DetailsPlaceholder() {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Image(
+                modifier = Modifier.size(196.dp),
+                imageVector = Icons.Default.Task,
+                contentDescription = null
+            )
+            Text(text = "Pick a TODO")
+        }
     }
 }
