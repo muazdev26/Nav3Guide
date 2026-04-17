@@ -1,8 +1,8 @@
-package com.plcoding.nav3_guide.navigation
-
+package com.plcoding.nav3_guide.auth
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
@@ -10,44 +10,50 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import androidx.savedstate.serialization.SavedStateConfiguration
-import com.plcoding.nav3_guide.auth.AuthNavigation
-import com.plcoding.nav3_guide.screens.TodoNavigation
+import com.plcoding.nav3_guide.navigation.Route
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 
 @Composable
-fun NavigationRoot(
+fun AuthNavigation(
+    onLogin: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val rootBackStack = rememberNavBackStack(
+    val authBackStack = rememberNavBackStack(
         configuration = SavedStateConfiguration {
             serializersModule = SerializersModule {
                 polymorphic(NavKey::class) {
-                    subclass(Route.Auth::class, Route.Auth.serializer())
-                    subclass(Route.Todo::class, Route.Todo.serializer())
+                    subclass(Route.Auth.Login::class, Route.Auth.Login.serializer())
+                    subclass(Route.Auth.Register::class, Route.Auth.Register.serializer())
                 }
             }
         },
-        Route.Auth
+        Route.Auth.Login
     )
+    val sharedAuthViewModel = viewModel { SharedAuthViewModel() }
     NavDisplay(
+        backStack = authBackStack,
         modifier = modifier,
-        backStack = rootBackStack,
         entryDecorators = listOf(
             rememberSaveableStateHolderNavEntryDecorator(),
             rememberViewModelStoreNavEntryDecorator()
         ),
         entryProvider = entryProvider {
-            entry<Route.Auth> {
-                AuthNavigation(
-                    onLogin = {
-                        rootBackStack.remove(Route.Auth)
-                        rootBackStack.add(Route.Todo)
+            entry<Route.Auth.Login> {
+                LoginScreen(
+                    viewModel = viewModel { LoginViewModel() },
+                    sharedAuthViewModel = sharedAuthViewModel,
+                    onLogin = onLogin,
+                    onRegisterClick = {
+                        authBackStack.add(Route.Auth.Register)
                     }
                 )
             }
-            entry<Route.Todo> {
-                TodoNavigation()
+            entry<Route.Auth.Register> {
+                RegisterScreen(
+                    viewModel = viewModel { RegisterViewModel() },
+                    sharedAuthViewModel = sharedAuthViewModel,
+                )
             }
         }
     )
