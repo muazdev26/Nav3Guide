@@ -11,6 +11,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
+import com.plcoding.nav3_guide.scenes.ListDetailScene
+import com.plcoding.nav3_guide.scenes.rememberListDetailSceneStrategy
 import com.plcoding.nav3_guide.screens.TodoDetailScreen
 import com.plcoding.nav3_guide.screens.TodoListScreen
 
@@ -41,23 +43,30 @@ fun NavigationRoot(
                 .fillMaxSize()
                 .padding(innerPadding),
             onBack = navigator::goBack,
+            sceneStrategy = rememberListDetailSceneStrategy(),
             entries = navigationState.toEntries(
                 entryProvider {
-                    entry<Route.TodoList> {
+                    entry<Route.TodoList>(
+                        metadata = ListDetailScene.listPane()
+                    ) {
                         TodoListScreen(
                             onTodoClick = {
                                 navigator.navigate(Route.TodoDetail(it))
                             }
                         )
                     }
-                    entry<Route.TodoFavorites> {
+                    entry<Route.TodoFavorites>(
+                        metadata = ListDetailScene.listPane()
+                    ) {
                         TodoListScreen(
                             onTodoClick = {
                                 navigator.navigate(Route.TodoDetail(it))
                             }
                         )
                     }
-                    entry<Route.TodoDetail> {
+                    entry<Route.TodoDetail>(
+                        metadata = ListDetailScene.detailPane()
+                    ) {
                         TodoDetailScreen(
                             todo = it.todo
                         )

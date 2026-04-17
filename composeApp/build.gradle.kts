@@ -38,6 +38,7 @@ kotlin {
             implementation(compose.foundation)
             implementation(compose.material3)
             implementation(compose.ui)
+            implementation(compose.materialIconsExtended)
             implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)
             implementation(libs.androidx.lifecycle.viewmodelCompose)
@@ -47,7 +48,8 @@ kotlin {
             implementation(libs.jetbrains.lifecycle.viewmodel.nav3)
             implementation(libs.jetbrains.lifecycle.viewmodel)
             implementation(libs.kotlinx.serialization.json)
-            implementation(libs.material.icons.extended)
+            implementation(libs.material3.adaptive)
+            implementation(libs.material3.adaptive.layout)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
