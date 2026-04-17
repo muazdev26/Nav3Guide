@@ -1,54 +1,78 @@
 package com.plcoding.nav3_guide.navigation
 
-
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
-import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
-import androidx.navigation3.runtime.rememberNavBackStack
-import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
-import androidx.savedstate.serialization.SavedStateConfiguration
-import com.plcoding.nav3_guide.auth.AuthNavigation
-import com.plcoding.nav3_guide.screens.TodoNavigation
-import kotlinx.serialization.modules.SerializersModule
-import kotlinx.serialization.modules.polymorphic
+import com.plcoding.nav3_guide.screens.TodoDetailScreen
+import com.plcoding.nav3_guide.screens.TodoListScreen
 
 @Composable
 fun NavigationRoot(
     modifier: Modifier = Modifier
 ) {
-    val rootBackStack = rememberNavBackStack(
-        configuration = SavedStateConfiguration {
-            serializersModule = SerializersModule {
-                polymorphic(NavKey::class) {
-                    subclass(Route.Auth::class, Route.Auth.serializer())
-                    subclass(Route.Todo::class, Route.Todo.serializer())
-                }
-            }
-        },
-        Route.Auth
+    val navigationState = rememberNavigationState(
+        startRoute = Route.TodoList,
+        topLevelRoutes = TOP_LEVEL_DESTINATIONS.keys
     )
-    NavDisplay(
+    val navigator = remember {
+        Navigator(navigationState)
+    }
+    Scaffold(
         modifier = modifier,
-        backStack = rootBackStack,
-        entryDecorators = listOf(
-            rememberSaveableStateHolderNavEntryDecorator(),
-            rememberViewModelStoreNavEntryDecorator()
-        ),
-        entryProvider = entryProvider {
-            entry<Route.Auth> {
-                AuthNavigation(
-                    onLogin = {
-                        rootBackStack.remove(Route.Auth)
-                        rootBackStack.add(Route.Todo)
-                    }
-                )
-            }
-            entry<Route.Todo> {
-                TodoNavigation()
-            }
+        bottomBar = {
+            TodoNavigationBar(
+                selectedKey = navigationState.topLevelRoute,
+                onSelectKey = {
+                    navigator.navigate(it)
+                }
+            )
         }
-    )
+    ) { innerPadding ->
+        NavDisplay(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding),
+            onBack = navigator::goBack,
+            entries = navigationState.toEntries(
+                entryProvider {
+                    entry<Route.TodoList> {
+                        TodoListScreen(
+                            onTodoClick = {
+                                navigator.navigate(Route.TodoDetail(it))
+                            }
+                        )
+                    }
+                    entry<Route.TodoFavorites> {
+                        TodoListScreen(
+                            onTodoClick = {
+                                navigator.navigate(Route.TodoDetail(it))
+                            }
+                        )
+                    }
+                    entry<Route.TodoDetail> {
+                        TodoDetailScreen(
+                            todo = it.todo
+                        )
+                    }
+                    entry<Route.Settings> {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text("Settings")
+                        }
+                    }
+                }
+            )
+        )
+    }
 }
