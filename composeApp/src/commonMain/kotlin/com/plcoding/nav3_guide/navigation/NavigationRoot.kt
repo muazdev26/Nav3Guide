@@ -13,6 +13,8 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
 import com.plcoding.nav3_guide.scenes.ListDetailScene
 import com.plcoding.nav3_guide.scenes.rememberListDetailSceneStrategy
+import com.plcoding.nav3_guide.screens.ChangeSettingScreen
+import com.plcoding.nav3_guide.screens.SettingsScreen
 import com.plcoding.nav3_guide.screens.TodoDetailScreen
 import com.plcoding.nav3_guide.screens.TodoListScreen
 
@@ -27,6 +29,7 @@ fun NavigationRoot(
     val navigator = remember {
         Navigator(navigationState)
     }
+    val resultStore = rememberResultStore()
     Scaffold(
         modifier = modifier,
         bottomBar = {
@@ -72,13 +75,20 @@ fun NavigationRoot(
                         )
                     }
                     entry<Route.Settings> {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text("Settings")
-                        }
+                        SettingsScreen(
+                            resultStore = resultStore,
+                            onChangeSettingClick = {
+                                navigator.navigate(Route.ChangeSetting)
+                            }
+                        )
+                    }
+                    entry<Route.ChangeSetting> {
+                        ChangeSettingScreen(
+                            resultStore = resultStore,
+                            onSave = {
+                                navigator.goBack()
+                            }
+                        )
                     }
                 }
             )

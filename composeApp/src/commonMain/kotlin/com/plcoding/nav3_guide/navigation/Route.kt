@@ -4,8 +4,10 @@ import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 
 @Serializable
-sealed interface Route: NavKey {
-
+sealed interface
+Route: NavKey {
+    @Serializable
+    data object ChangeSetting: Route
     @Serializable
     data object TodoList: Route
 
