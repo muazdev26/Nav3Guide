@@ -8,6 +8,9 @@ sealed interface Route: NavKey {
 
     @Serializable
     data object Auth: Route, NavKey {
+
+        @Serializable
+        data object SampleBottomSheet : NavKey
         @Serializable
         data object Login: Route, NavKey
 

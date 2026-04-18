@@ -18,6 +18,7 @@ fun LoginScreen(
     sharedAuthViewModel: SharedAuthViewModel,
     onLogin: () -> Unit,
     onRegisterClick: () -> Unit,
+    onBSClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val localCounter by viewModel.counter.collectAsStateWithLifecycle()
@@ -43,6 +44,11 @@ fun LoginScreen(
             onClick = onLogin
         ) {
             Text("Login")
+        }
+        Button(
+            onClick = onBSClick
+        ) {
+            Text("Show Bottom Sheet")
         }
         Button(
             onClick = onRegisterClick
